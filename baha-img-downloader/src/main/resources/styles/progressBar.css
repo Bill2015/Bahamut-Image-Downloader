@@ -1,0 +1,4 @@
+.progress-bar > .track {
+    -fx-text-box-border: rgb(8, 8, 8);
+    -fx-control-inner-background: rgb(204, 209, 255);
+}

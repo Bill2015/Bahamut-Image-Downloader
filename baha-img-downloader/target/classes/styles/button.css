@@ -1,0 +1,44 @@
+.downloadBtn{
+    -fx-background-color: rgb(168, 250, 135);
+    -fx-border: none;
+}
+.downloadBtn:hover{
+    -fx-background-color: rgb(103, 252, 45);
+}
+
+/*==========================================================*/
+.filterBtn{
+    -fx-background-color: rgb(115, 192, 255);
+    -fx-border: none;
+}
+.filterBtn:hover{
+    -fx-background-color: rgb(54, 164, 253);
+}
+
+/*==========================================================*/
+.resetBtn{
+    -fx-background-color: rgb(253, 148, 148);
+    -fx-border: none;
+}
+.resetBtn:hover{
+    -fx-background-color: rgb(247, 76, 76);
+}
+
+/*==========================================================*/
+.searchBtn{
+    -fx-background-color: rgb(239, 248, 156);
+    -fx-border: none;
+}
+.searchBtn:hover{
+    -fx-background-color:  rgb(237, 255, 78);
+}
+
+
+/*==========================================================*/
+.closeBtn{
+    -fx-background-color: rgb(61, 61, 61);
+    -fx-border: none;
+}
+.closeBtn:hover{
+    -fx-background-color:  rgb(15, 15, 15);
+}

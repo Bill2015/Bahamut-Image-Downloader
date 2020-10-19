@@ -1,0 +1,20 @@
+/** ========================================================================================
+============================================================================================
+=================    這裡是給對圖片點右鍵時，所跳出訊息的 Menu Item  ========================== */
+.alertMenu{
+    -fx-background-color: transparent;
+    -fx-opacity: 0.9;
+}
+.alertMenu .label{
+    -fx-text-fill:rgb(255, 29, 29)
+}
+.alertMenuItem{
+    -fx-font-weight: bold;
+    -fx-font-size: larger;
+}
+.alertMenuItem:focused {
+    -fx-background-color: transparent;
+}
+.alertMenuItem:hover{
+    -fx-background-color: transparent;
+}
