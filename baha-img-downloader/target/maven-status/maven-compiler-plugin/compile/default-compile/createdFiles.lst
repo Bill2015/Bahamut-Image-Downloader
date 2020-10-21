@@ -1,9 +1,6 @@
 jiaxiang\org\App.class
-jiaxiang\org\util\BahaHmtlGetter.class
-jiaxiang\org\util\SearchService.class
 jiaxiang\org\TitleMenuBar.class
 jiaxiang\org\components\InfoStage$1.class
-jiaxiang\org\util\BahaHmtlGetter$HtmlFileWriter.class
 jiaxiang\org\components\ImageBox.class
 jiaxiang\org\TitleMenuBar$2.class
 jiaxiang\org\components\InfoStage.class
