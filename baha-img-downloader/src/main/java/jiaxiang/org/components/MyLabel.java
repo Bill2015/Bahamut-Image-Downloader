@@ -7,7 +7,7 @@ import javafx.scene.text.Font;
 /** <p>自訂義 {@link Label}</p> 
  *  字體預設 {@code 微軟正黑體}*/
 final public class MyLabel extends Label {
-    public final static String FONT_FAMLIY = "微軟正黑體";
+    final public static String FONT_FAMLIY = "微軟正黑體";
     /** <p>自訂義 {@link Label} 建構子</p> 
      *  字體顏色預設 {@code #b8b8b8}
      *  @param text 顯示的文字 

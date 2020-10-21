@@ -1,5 +1,6 @@
 package jiaxiang.org.components;
 
+import javafx.beans.property.DoubleProperty;
 import javafx.geometry.Pos;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
@@ -42,6 +43,9 @@ public final class LabeledProgressBar extends HBox{
         setAlignment( Pos.BOTTOM_LEFT );
         getChildren().addAll( label, progressBar );
     }
+    /** 取得搜尋進度條 Property
+    *  @return 進度條 Property {@code [DoubleProperty]}*/
+    public DoubleProperty getProgressProperty(){ return progressBar.progressProperty(); }
     /** 取得搜尋進度條
     *  @return 進度條 {@code [ProgressBar]}*/
     public ProgressBar getProgressBar(){ return progressBar; }

@@ -1,29 +1,35 @@
 package jiaxiang.org;
 
+import javafx.beans.property.SimpleListProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination.ModifierValue;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
+import jiaxiang.org.components.ImageBox;
 import jiaxiang.org.components.MyLabel;
 import jiaxiang.org.components.NumberTextField;
 
 public class FilterPane extends BorderPane {
 
     /** GP 的 {@link NumberTextField} */
-    private final NumberTextField gpTextField;
+    final private NumberTextField gpTextField;
     /** BP 的 {@link NumberTextField} */
-    private final NumberTextField bpTextField;
+    final private NumberTextField bpTextField;
 
     /** 篩選鈕按鍵 */
-    private final Button filterBtn;
+    final private Button filterBtn;
 
     /** 回復鈕按鍵 */
-    private final Button resetBtn;
+    final private Button resetBtn;
 
     public FilterPane(){
         
@@ -45,7 +51,7 @@ public class FilterPane extends BorderPane {
 
         //噓數的元件初始化
         MyLabel bpLabel = new MyLabel( "噓數（BP）：", 18 );
-        bpTextField = new NumberTextField(0, 1000, 0, 70);
+        bpTextField = new NumberTextField(0, 1000, 1000, 70);
         bpTextField.setFont( new Font(MyLabel.FONT_FAMLIY, 12 ) );
         bpTextField.setPadding( new Insets(3) );
         bpTextField.setMinDefaultText( "-" );
@@ -100,4 +106,57 @@ public class FilterPane extends BorderPane {
     /** 取得重置鈕
      *  @return 重置鈕 {@code [Button]} */
     final public Button getResetButton(){  return resetBtn; }
+
+    //============================================================================================
+    //============================================================================================
+    /** 篩選功能初始化 
+     *  @param imageBoxsList 圖片串列
+     *  @param primaryState 主要視窗(用來綁定快捷鍵) */
+    final public void filterEventInitialize( SimpleListProperty<ImageBox> imageBoxsList, Stage primaryState  ){
+        filterBtn.setOnAction( evt -> filterOperation( imageBoxsList ) );
+        setOnKeyPressed(evt -> {
+            if (evt.getCode() == KeyCode.ENTER)
+                filterOperation( imageBoxsList );
+        });
+        // 篩選按鈕 快捷鍵(Ctrl + F)
+        KeyCodeCombination qucikFilter = new KeyCodeCombination(KeyCode.F, 
+                                                                ModifierValue.UP, 
+                                                                ModifierValue.DOWN,
+                                                                ModifierValue.UP, 
+                                                                ModifierValue.UP, 
+                                                                ModifierValue.UP);
+                primaryState.getScene().getAccelerators().put(qucikFilter, () -> filterOperation( imageBoxsList ) );
+    
+    
+        // 重置按鈕 快捷鍵(Ctrl + R)
+        resetBtn.setOnAction(evt -> resetOperation( imageBoxsList ) );
+        KeyCodeCombination qucikReset = new KeyCodeCombination( KeyCode.R, 
+                                                                ModifierValue.UP, 
+                                                                ModifierValue.DOWN,
+                                                                ModifierValue.UP, 
+                                                                ModifierValue.UP, 
+                                                                ModifierValue.UP);
+                primaryState.getScene().getAccelerators().put(qucikReset, () -> resetOperation( imageBoxsList ) );
+    }
+    /** 篩選功能
+     *  @param imageBoxList 圖片串列 */
+    final private void filterOperation( SimpleListProperty<ImageBox> imageBoxList ){
+        int gpValue = gpTextField.getCurrentValue();
+        int bpValue = bpTextField.getCurrentValue();
+
+        // 判斷文章的 GP(推) 與 BP(噓) 數
+        for ( ImageBox imageBox : imageBoxList ) {
+            //顯示 or 隱藏
+            imageBox.setNeedSaved( (imageBox.getGPValue() >= gpValue && imageBox.getBPValue() <= bpValue) ? true : false );
+        }
+    }
+
+    /** 篩選功能復原
+     *  @param imageBoxList 圖片串列 */
+    private void resetOperation( SimpleListProperty<ImageBox> imageBoxList ) {
+        // 空的就不要執行了
+        if ( imageBoxList.isEmpty() )
+            return;
+        imageBoxList.forEach(imageBox -> imageBox.setNeedSaved( true ) );
+    }
 }

@@ -3,7 +3,6 @@ package jiaxiang.org.components;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-
 import javafx.animation.ScaleTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -22,22 +21,21 @@ import jiaxiang.org.ImagePane;
 
 public class ImageBox extends BorderPane{
     /** 發文者 {@code ID} */
-    private final String authorId;
+    final private String authorId;
     /** 發文者 {@code 暱稱} */
-    private final String authorName;
+    final private String authorName;
     /** 此樓的 {@code 推} 數 */
-    private final int gpCount;
+    final private int gpCount;
     /** 此樓的 {@code 噓} 數 */
-    private final int c8763Count;
+    final private int c8763Count;
     /** 此樓的 {@code 樓層} */
-    private final int floor;
+    final private int floor;
     /** 此圖片的 {@code 網址} */
-    private final String url;
+    final private String url;
     /** 顯示圖片的 {@code ImageView} */
     private ImageView imageView;
     /** 設定是否要儲存該圖片 */
     private boolean needSaved = true;
-
     protected ImageBox( String authorId, String authorName, int gbCount, int c8763Count, int floor, String url ){
         this.authorId   = authorId;
         this.authorName = authorName;
@@ -109,12 +107,14 @@ public class ImageBox extends BorderPane{
         scoreHBox.setAlignment( Pos.BASELINE_LEFT );
         bottomBoderPane.setLeft( scoreHBox );
 
+
         setMaxWidth( 280 );
         setMinWidth( 280 );
         setPrefWidth( 280 );
         setBottom( bottomBoderPane );
         setPadding( new Insets(5, 10, 5, 10) );
         getStyleClass().add( "imageBox-body" );
+        managedProperty().bind( visibleProperty() );
     }
 
     //==================================================================================
@@ -153,7 +153,18 @@ public class ImageBox extends BorderPane{
 
     /** 設定是否需要儲存圖片 
      *  @param flag 設定是否需要儲存圖片 {@code true = 要} | {@code false = 不要}*/
-    final public void setNeedSaved( boolean flag ){ this.needSaved = flag; }
+    final public void setNeedSaved( boolean flag ){ 
+        //需要儲存就把它加入至父節點
+        if( flag ){
+            setVisible( true );
+            setPrefWidth( 280 );    //邊長復原
+        }
+        else {
+            setVisible( false );
+            setPrefWidth( 0 );      //邊長設為 0 已讓其他物件上推 
+        }
+        this.needSaved = flag; 
+    }
     
     //==================================================================================
     /** 是否需要儲存圖片 
@@ -184,6 +195,7 @@ public class ImageBox extends BorderPane{
      *  @return 回傳 {@code [ImageBoxBuilder]}*/
     public static final ImageBoxBuilder getBuilder(){ return new ImageBoxBuilder(); }
     
+    /** {@link ImageBox} 建構者 */
     public static final class ImageBoxBuilder{
         /** 發文者 {@code ID} */
         private String authorId;
@@ -221,8 +233,7 @@ public class ImageBox extends BorderPane{
         final public ImageBox build(){
             return new ImageBox(authorId, authorName, gpCount, bpCount, floor, url);
         }
-    } 
-
+    }
 
     
 }
