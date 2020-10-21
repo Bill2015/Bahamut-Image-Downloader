@@ -17,7 +17,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
-import jiaxiang.org.ImagePane;
+import jiaxiang.org.view.ImagePaneView;
 
 public class ImageBox extends BorderPane{
     /** 發文者 {@code ID} */
@@ -36,6 +36,8 @@ public class ImageBox extends BorderPane{
     private ImageView imageView;
     /** 設定是否要儲存該圖片 */
     private boolean needSaved = true;
+    /** 是否錯誤(通常是圖片讀取時發生錯誤) */
+    private boolean isFailed = false;
     protected ImageBox( String authorId, String authorName, int gbCount, int c8763Count, int floor, String url ){
         this.authorId   = authorId;
         this.authorName = authorName;
@@ -51,6 +53,11 @@ public class ImageBox extends BorderPane{
 
         //設定圖片顯示
         Image img = new Image( url, true );
+        //假如圖片 Loading 失敗就隱藏
+        img.errorProperty().addListener( (obser, oldVal, newVal) -> {
+            this.isFailed = true; 
+            setNeedSaved( false );
+        }  );
         imageView = new ImageView( img );
 
         //依照比例縮小，因為是 Lazy Loading 所以要監聽完成時候
@@ -129,7 +136,7 @@ public class ImageBox extends BorderPane{
                 scaleTransition.playFromStart();
 
                 scaleTransition.setOnFinished( aniEvt -> {
-                    ((ImagePane) this.getParent().getParent().getParent().getParent()).getFlowPane().getChildren().remove( this );
+                    ((ImagePaneView) this.getParent().getParent().getParent().getParent()).getFlowPane().getChildren().remove( this );
                     this.setScaleX( 1.0 );this.setScaleY( 1.0 );
                 } );
                 
@@ -156,8 +163,10 @@ public class ImageBox extends BorderPane{
     final public void setNeedSaved( boolean flag ){ 
         //需要儲存就把它加入至父節點
         if( flag ){
-            setVisible( true );
-            setPrefWidth( 280 );    //邊長復原
+            if( isFailed == false ){
+                setVisible( true );
+                setPrefWidth( 280 );    //邊長復原
+            }
         }
         else {
             setVisible( false );

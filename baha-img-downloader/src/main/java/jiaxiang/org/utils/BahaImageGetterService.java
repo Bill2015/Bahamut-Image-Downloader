@@ -18,7 +18,7 @@ import javafx.concurrent.Task;
 import jiaxiang.org.components.ImageBox;
 import jiaxiang.org.components.ImageBox.ImageBoxBuilder;
 
-
+//c-post__header__title 
 
 public final class BahaImageGetterService extends Service<Void>{
     /** 此串開始的樓層 */
@@ -48,10 +48,8 @@ public final class BahaImageGetterService extends Service<Void>{
 
     /** <p>抓取巴哈圖片的類別</p>
      *  <p>繼承了 {@link Task} 已讓 {@link Service } 使用*/
-    private class BahaImageGetterTask extends Task<Void>{
+    private static class BahaImageGetterTask extends Task<Void>{
         
-        /** 主要網址標頭 */
-        private final String HEADER = "https://forum.gamer.com.tw/C.php";
         /** 網址後方的參數(Get) */
         private String postVal;
         /** 將 HTML 檔寫成檔案，以方便查看(目前程式不會用到) */
@@ -63,13 +61,23 @@ public final class BahaImageGetterService extends Service<Void>{
         /** 此串結束的樓層 */
         private int floorEnd = 99999;
         /** 爬蟲完的圖片串列存檔 */
-        private final SimpleListProperty<ImageBox> resultList;
+        final private SimpleListProperty<ImageBox> resultList;
+        /** 主要網址標頭 */
+        final static private String HEADER = "https://forum.gamer.com.tw/C.php";
         /** 每一頁的樓層數(根據網頁版的巴哈，每一頁都有20樓) */
-        private final static int MAX_PAGE_COUNT = 20;
+        final static private int MAX_PAGE_COUNT = 20;
         /** 餅乾 */
-        private final HashMap<String, String> cookies;
+        final static private HashMap<String, String> COOKIES = new HashMap<>();
         /** 輸入的網址 */
         private String inUrl;
+
+        //靜態變數初始化
+        {
+            COOKIES.put("_ga", "GA1.4.1059733215.1591118241");      
+            COOKIES.put("_gid", "GA1.4.1850309596.1593739183");      
+            COOKIES.put("ckBahaGif", "e1fad4bcddf343af8933981b53170c63");     
+        }
+        
         /** 建構子，執行  
          *  @param inUrl 要剖析的串
          *  @param floorStart 開始的樓層
@@ -80,19 +88,21 @@ public final class BahaImageGetterService extends Service<Void>{
             this.inUrl      = inUrl;
             this.resultList = resultList;
 
-            cookies = new HashMap<>();
-            cookies.put("_ga", "GA1.4.1059733215.1591118241");      
-            cookies.put("_gid", "GA1.4.1850309596.1593739183");      
-            cookies.put("ckBahaGif", "e1fad4bcddf343af8933981b53170c63");      
+             
         }
         @Override protected Void call() throws Exception{
             
             //用來將 Document 寫出，以方便剖析
             //htmlFileWriter = new HtmlFileWriter();
 
+            Document document = Jsoup.connect( inUrl ).cookies( COOKIES ).get();
+
             //取得此串的最大頁數
-            maxPage = getMaxPage( Jsoup.connect( inUrl ).get().getElementsByClass("BH-pagebtnA").first() );
+            maxPage = getMaxPage( document.getElementsByClass("BH-pagebtnA").first() );
             maxPage = Math.min( (floorEnd / MAX_PAGE_COUNT) + 1, maxPage);
+
+            // 設定文章標題為此行程的訊息
+            updateTitle( getArticleTitle( document ) );
 
             //利用樓層計算開始的頁數
             final int startPage = floorStart / MAX_PAGE_COUNT;
@@ -118,7 +128,7 @@ public final class BahaImageGetterService extends Service<Void>{
          *  @param url 網址 */
         private void progress( String url ) throws IOException{
             //取得網址
-            Document doc = Jsoup.connect( url ).cookies(cookies).get();
+            Document doc = Jsoup.connect( url ).cookies( COOKIES ).get();
 
             //取得作者元素
             Elements authors = getAuthorsElements( doc );
@@ -159,6 +169,12 @@ public final class BahaImageGetterService extends Service<Void>{
             Elements authors = doc.body().getElementsByTag("section");
             authors.removeIf( elem -> !elem.hasAttr("id") );
             return authors;
+        }
+
+        /** 取得這個頁面的標題
+         *  @return 文章標題 {@code [String]}*/
+        private String getArticleTitle( Document doc ){
+            return doc.body().getElementsByClass("title").first().text();
         }
 
         /** 取得此元素的推數與噓數 

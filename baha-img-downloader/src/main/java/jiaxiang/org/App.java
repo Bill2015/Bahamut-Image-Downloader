@@ -1,23 +1,27 @@
 package jiaxiang.org;
 
 import java.io.IOException;
-import java.util.ArrayList;
-
 
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.beans.property.SimpleListProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import jiaxiang.org.components.ImageBox;
+import jiaxiang.org.controller.DownloadController;
+import jiaxiang.org.controller.FilterController;
+import jiaxiang.org.controller.ImageViewController;
+import jiaxiang.org.controller.TitleMenuController;
+import jiaxiang.org.controller.SearchController;
+import jiaxiang.org.model.DataModel;
+import jiaxiang.org.view.DownloadView;
+import jiaxiang.org.view.FilterView;
+import jiaxiang.org.view.HistoryView;
+import jiaxiang.org.view.ImagePaneView;
+import jiaxiang.org.view.TitleMenuView;
+import jiaxiang.org.view.SearchView;
 import lk.vivoxalabs.customstage.CustomStage;
 import lk.vivoxalabs.customstage.CustomStageBuilder;
 import lk.vivoxalabs.customstage.tools.HorizontalPos;
-
 
 /***********************************************************************
  *  Baha Image Downloader 
@@ -39,31 +43,14 @@ import lk.vivoxalabs.customstage.tools.HorizontalPos;
  * <p>
  * 繼承了 {@link Application}
  */
-public class App extends Application{
+public class App extends Application {
 
-    /** 主要的 Stage<p>
-     * 通常只用在開啟第二個視窗時需要鎖住 </p>
+    /**主要的 Stage<p>
+     * 通常只用在開啟第二個視窗時需要鎖住</p>
      */
     public CustomStage PRIMARY_STAGE;
-
-    /** 圖片串列 */
-    private SimpleListProperty<ImageBox> imageBoxList;
-
-    /** 上方工具列 */
-    private TitleMenuBar menuBar;
-
-    /** 網址輸入列 */
-    private SearchPane searchPane;
-
-    /** 主要圖片預覽列 */
-    private ImagePane imagePane;
-
-    /** 過濾器頁面 */
-    private FilterPane filterPane;
-
-    /** 下載的面板 */
-    private DownloadPane downloadPane;
-
+    /** 主程式資料 */
+    private DataModel dataModel;
     public static void main(String[] args) {
         try {
             launch(args);
@@ -75,30 +62,37 @@ public class App extends Application{
     @Override
     public void start(Stage primaryStage) throws IOException {
 
-        menuBar         = new TitleMenuBar(PRIMARY_STAGE); // 上方工具列
-        searchPane      = new SearchPane(); // 網址輸入列
-        imagePane       = new ImagePane(); // 主要圖片預覽列
-        downloadPane    = new DownloadPane(); // 下載面板
-        filterPane      = new FilterPane(); // 篩選面板
+        // Model 初始化
+        dataModel       = new DataModel();  //主程式資料
+
+        //View 初始化
+        final TitleMenuView titleMenuView   = new TitleMenuView();    // 上方工具列
+        final SearchView    searchView      = new SearchView();     // 網址輸入列
+        final ImagePaneView imagePaneView   = new ImagePaneView();  // 主要圖片預覽列
+        final DownloadView  downloadView    = new DownloadView();   // 下載面板
+        final FilterView    filterView      = new FilterView();     // 篩選面板
+        final HistoryView   historyView     = new HistoryView();    // 歷史紀錄面板
+
 
         // 主要介面布局
         Insets insets = new Insets(5);
-        BorderPane borderPane = new BorderPane(imagePane, searchPane, null, downloadPane, null);
+        BorderPane borderPane = new BorderPane(imagePaneView, searchView, null, downloadView, null);
         borderPane.setPadding(new Insets(10));
-        BorderPane.setMargin(imagePane, insets);
-        BorderPane.setMargin(searchPane, insets);
-        BorderPane.setMargin(downloadPane, insets);
+        BorderPane.setMargin(imagePaneView, insets);
+        BorderPane.setMargin(searchView, insets);
+        BorderPane.setMargin(downloadView, insets);
         borderPane.setPadding(new Insets(0, 30, 0, 30));
 
-        StackPane stackPane = new StackPane(new BorderPane(borderPane, menuBar, null, null, filterPane));
-        stackPane.getStylesheets().add(getClass().getResource("/styles/borderTitle.css").toExternalForm());
-        stackPane.getStylesheets().add(getClass().getResource("/styles/tabPane.css").toExternalForm());
-        stackPane.getStylesheets().add(getClass().getResource("/styles/alertMenu.css").toExternalForm());
-        stackPane.getStylesheets().add(getClass().getResource("/styles/button.css").toExternalForm());
-        stackPane.getStylesheets().add(getClass().getResource("/styles/imageBox.css").toExternalForm());
-        stackPane.getStylesheets().add(getClass().getResource("/styles/progressBar.css").toExternalForm());
+        StackPane stackPane = new StackPane(new BorderPane(borderPane, titleMenuView, historyView, null, filterView));
+        stackPane.getStylesheets().addAll( 
+            "/styles/borderTitle.css",
+            "/styles/tabPane.css",
+            "/styles/alertMenu.css",
+           "/styles/button.css",
+            "/styles/nodeBox.css",
+            "/styles/progressBar.css"
+        );
 
-        stackPane.setStyle("-fx-background-color: #3a3a3a");
 
         // 使用一個名為 Custom Stage 的函式庫 Web： https://github.com/Oshan96/CustomStage/wiki
         PRIMARY_STAGE = new CustomStageBuilder().setTitleColor("#FFFFFF") // 設定標顏色
@@ -106,35 +100,23 @@ public class App extends Application{
                 .setIcon("/textures/logo.jpg").setWindowTitle("巴哈圖串下載器", HorizontalPos.RIGHT, HorizontalPos.CENTER)
                 .build();
 
-        PRIMARY_STAGE.changeScene(stackPane);
+        stackPane.setStyle("-fx-background-color: #3a3a3a");
+
+        PRIMARY_STAGE.changeScene( stackPane );
         PRIMARY_STAGE.show();
 
-        //註冊 ImageBox 改變事件
-        addImageBoxListListner();
+        //Controller 初始化
+        final ImageViewController   imageViewController = new ImageViewController( dataModel, imagePaneView );
+        final SearchController      searchController    = new SearchController( dataModel, searchView );
+        final FilterController      filterController    = new FilterController( dataModel, filterView, PRIMARY_STAGE );
+        final DownloadController    downloadController  = new DownloadController( dataModel, downloadView, PRIMARY_STAGE );
+        final TitleMenuController   titleMenuController = new TitleMenuController( dataModel, titleMenuView, PRIMARY_STAGE );
 
-        // 初始化搜尋按鈕與 Enter 鍵
-        searchPane.searchEventInitialize( imageBoxList );
 
-        // 初始化搜尋按鈕與 Enter 鍵
-        filterPane.filterEventInitialize( imageBoxList, PRIMARY_STAGE );
-
-        // 初始化圖片下載按鈕與 Enter 鍵
-        downloadPane.downloadEventInitialize( imageBoxList, PRIMARY_STAGE );
     }
 
-    private void addImageBoxListListner(){
-        imageBoxList = new SimpleListProperty<ImageBox>( FXCollections.observableArrayList(new ArrayList<ImageBox>()) );
-        imageBoxList.addListener((ListChangeListener.Change<? extends ImageBox> object) -> {
-            while( object.next() ){
-                if( object.wasAdded() ){
-                    Platform.runLater( () -> imagePane.getFlowPane().getChildren().addAll( object.getAddedSubList() ) );
-                }
-                else if( object.wasRemoved() ){
-                    Platform.runLater(  () -> imagePane.getFlowPane().getChildren().removeAll( object.getRemoved() )  );
-                }
-            }
-        } );
-    }
+
+
 
 }
 
