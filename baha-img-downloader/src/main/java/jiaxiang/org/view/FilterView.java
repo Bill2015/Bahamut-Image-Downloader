@@ -20,10 +20,8 @@ public class FilterView extends BorderPane {
     final private NumberTextField gpTextField;
     /** BP 的 {@link NumberTextField} */
     final private NumberTextField bpTextField;
-
     /** 篩選鈕按鍵 */
     final private Button filterBtn;
-
     /** 回復鈕按鍵 */
     final private Button resetBtn;
 

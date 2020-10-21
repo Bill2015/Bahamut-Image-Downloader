@@ -109,6 +109,18 @@ public final class NumberTextField extends TextField{
         MAX_VALUE_DEFAULT_STRING = text;
         checkOutOfRange();
     }
+    /** 設定目前數字
+     *  @param val 數值*/
+    final public void setCurrentValue( int val ){
+        if( val <= MIN_VALUE || val >= MAX_VALUE ) {
+            setText( (val <= MIN_VALUE) ? MIN_VALUE_DEFAULT_STRING : MAX_VALUE_DEFAULT_STRING );
+            curVal = (val <= MIN_VALUE) ? MIN_VALUE : MAX_VALUE;
+        }
+        else{
+            curVal = val;
+            setText( Integer.toString( val ) );
+        }
+    }
     /** 取得當前數值 
      *  @return 數值 {@code [int]}*/
     final public int getCurrentValue(){ return curVal; }

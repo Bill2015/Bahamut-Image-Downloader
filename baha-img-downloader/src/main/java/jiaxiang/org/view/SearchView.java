@@ -111,6 +111,16 @@ public class SearchView extends VBox {
     final public void alert( String text ){
         alertInfo.alert( urlTextField, text, 110, 20);
     }
+    /** 設定樓層範圍
+     *  @param start 開始
+     *  @param end 結束 */
+    public void setFloorRange( int start, int end ){ 
+        floorTextFieldStart.setCurrentValue( start ); 
+        floorTextFieldEnd.setCurrentValue( end ); 
+    }
+     /** 設定搜尋址網的址
+     *  @param url  欲設定的搜尋網址*/
+    public void setInputURL( String url  ){ urlTextField.setText( url ); }
     /** 取得搜尋的址網址
      *  @return 搜尋網址 {@code [String]}*/
     public String getInputURL(){ return urlTextField.getText(); }

@@ -28,11 +28,11 @@ public class HistoryView extends BorderPane{
 
         final ScrollPane scrollPane = new ScrollPane( flowPane );
         // 垂直 Scroll Bar 監聽
-        scrollPane.setVbarPolicy( ScrollPane.ScrollBarPolicy.AS_NEEDED ); // Vertical scroll bar
+        scrollPane.setVbarPolicy( ScrollPane.ScrollBarPolicy.NEVER ); // Vertical scroll bar
         scrollPane.setHbarPolicy( ScrollPane.ScrollBarPolicy.NEVER );
         scrollPane.viewportBoundsProperty().addListener( (obser, oldBounds, newBounds) -> {
             flowPane.setPrefWidth( newBounds.getWidth() );
-            flowPane.setPrefHeight( newBounds.getHeight() - 1 );
+            flowPane.setPrefHeight( newBounds.getHeight() - 0.75 );
         });
         // 增加卷軸的移動速度
         flowPane.setOnScroll( (event) -> {
@@ -57,10 +57,9 @@ public class HistoryView extends BorderPane{
     public FlowPane getFlowPane() {
         return flowPane;
     }
-
-    /**取得中間顯示的所有圖片節點
-     * @return 所有顯示的圖片節點串列 {@code [ObservableList<Node>]} */
-    public ObservableList<Node> getImageBoxNodes() {
+    /**取得中間顯示的圖片節點 {@code ( FlowPane )} 的
+     *  @return 展示區的所有子節點 {@code [ObservableList<Node>]}*/
+    public ObservableList<Node> getFlowPaneChildren() {
         return flowPane.getChildren();
     }
 

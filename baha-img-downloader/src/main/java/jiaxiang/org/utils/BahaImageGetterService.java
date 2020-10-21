@@ -5,7 +5,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.regex.PatternSyntaxException;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,19 +18,22 @@ import org.jsoup.select.Elements;
 import javafx.beans.property.SimpleListProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import jiaxiang.org.bin.History;
 import jiaxiang.org.components.ImageBox;
 import jiaxiang.org.components.ImageBox.ImageBoxBuilder;
 
 //c-post__header__title 
 
-public final class BahaImageGetterService extends Service<Void>{
+public final class BahaImageGetterService extends Service<History>{
     /** 此串開始的樓層 */
     private int floorStart = 1;
     /** 此串結束的樓層 */
     private int floorEnd = 99999;
-    private final String inUrl;
+    final private String inUrl;
     /** 爬蟲完的圖片串列存檔 */
-    private final SimpleListProperty<ImageBox> resultList;
+    final private SimpleListProperty<ImageBox> resultList;
+    /** 主要網址標頭 */
+    final static public String HEADER = "https://forum.gamer.com.tw/C.php";
     /** 建構子，執行  
      *  @param inUrl 要剖析的串
      *  @param floorStart 開始的樓層
@@ -38,20 +44,21 @@ public final class BahaImageGetterService extends Service<Void>{
         this.inUrl      = inUrl;
         this.resultList = resultList;
     }
-    @Override protected Task<Void> createTask() {
+    @Override protected Task<History> createTask() {
         BahaImageGetterTask task = null;
         try{
             task = new BahaImageGetterTask(inUrl, floorStart, floorEnd, resultList);
-        }catch(Exception e){}
+        }catch(Exception e){
+            System.out.println("抓取圖片時，發生錯誤");
+            e.printStackTrace();
+        }
         return task;
     }
 
     /** <p>抓取巴哈圖片的類別</p>
      *  <p>繼承了 {@link Task} 已讓 {@link Service } 使用*/
-    private static class BahaImageGetterTask extends Task<Void>{
-        
-        /** 網址後方的參數(Get) */
-        private String postVal;
+    private static class BahaImageGetterTask extends Task<History>{
+
         /** 將 HTML 檔寫成檔案，以方便查看(目前程式不會用到) */
         private HtmlFileWriter htmlFileWriter;
         /** 此串的最大頁數 */
@@ -62,22 +69,15 @@ public final class BahaImageGetterService extends Service<Void>{
         private int floorEnd = 99999;
         /** 爬蟲完的圖片串列存檔 */
         final private SimpleListProperty<ImageBox> resultList;
-        /** 主要網址標頭 */
-        final static private String HEADER = "https://forum.gamer.com.tw/C.php";
+        /** 餅乾 */
+        final private HashMap<String, String> COOKIES = new HashMap<>();
         /** 每一頁的樓層數(根據網頁版的巴哈，每一頁都有20樓) */
         final static private int MAX_PAGE_COUNT = 20;
-        /** 餅乾 */
-        final static private HashMap<String, String> COOKIES = new HashMap<>();
         /** 輸入的網址 */
-        private String inUrl;
+        final private String inUrl;
+        /** 請求的歷史紀錄 */
+        private History nowHistory;
 
-        //靜態變數初始化
-        {
-            COOKIES.put("_ga", "GA1.4.1059733215.1591118241");      
-            COOKIES.put("_gid", "GA1.4.1850309596.1593739183");      
-            COOKIES.put("ckBahaGif", "e1fad4bcddf343af8933981b53170c63");     
-        }
-        
         /** 建構子，執行  
          *  @param inUrl 要剖析的串
          *  @param floorStart 開始的樓層
@@ -88,10 +88,15 @@ public final class BahaImageGetterService extends Service<Void>{
             this.inUrl      = inUrl;
             this.resultList = resultList;
 
-             
+            //初始化餅乾
+            COOKIES.put("_ga", "GA1.4.1059733215.1591118241");      
+            COOKIES.put("_gid", "GA1.4.1850309596.1593739183");      
+            COOKIES.put("ckBahaGif", "e1fad4bcddf343af8933981b53170c63");     
         }
-        @Override protected Void call() throws Exception{
-            
+
+        /** <p>複寫函式</p>  {@inheritDoc} */
+        @Override protected History call() throws Exception{
+
             //用來將 Document 寫出，以方便剖析
             //htmlFileWriter = new HtmlFileWriter();
 
@@ -101,14 +106,11 @@ public final class BahaImageGetterService extends Service<Void>{
             maxPage = getMaxPage( document.getElementsByClass("BH-pagebtnA").first() );
             maxPage = Math.min( (floorEnd / MAX_PAGE_COUNT) + 1, maxPage);
 
-            // 設定文章標題為此行程的訊息
-            updateTitle( getArticleTitle( document ) );
-
             //利用樓層計算開始的頁數
             final int startPage = floorStart / MAX_PAGE_COUNT;
 
-            //只會發生在第一頁
-            postVal = inUrl.split("bsn=")[1];
+            //只會發生在第一頁( 取得網址後方的參數(Get) )
+            String postVal = inUrl.split("bsn=")[1];
             postVal = "bsn=" + postVal;
             updateProgress(0, maxPage - startPage);
         
@@ -121,7 +123,15 @@ public final class BahaImageGetterService extends Service<Void>{
 
             //htmlFileWriter.close();
 
-            return null;
+            nowHistory = new History(
+                                    getUID(),                       //文章編號
+                                    getArticleTitle( document ),    //文章標題
+                                    floorStart,                     //開始樓層
+                                    floorEnd,                       //結束樓層
+                                     new Date()                     //下載日期
+            );
+
+            return nowHistory;
         }
 
         /** 抓取網站 Html Document 
@@ -180,27 +190,29 @@ public final class BahaImageGetterService extends Service<Void>{
         /** 取得此元素的推數與噓數 
          *  @param element 推與噓的 HTML 元素
          *  @return 推數與噓數 {@code [int]}*/
-        private int getScore( Elements elements ){
+        private int getScore( Elements elements ) throws NumberFormatException{
             //取得 BP or GB 數字元素
             String strnum = elements.first().child(0).text();
             //字數轉換
-            try{ 
-                switch (strnum) {
-                    case "爆":  return  9999;
-                    case "X":   return -9999;
-                    case "-":   return  0;
-                    default:    return Integer.parseInt( strnum ); 
-                } 
-            }
-            catch( NumberFormatException e ){ 
-                return 0; 
-            }
+            switch (strnum) {
+                case "爆":  return  9999;
+                case "X":   return -9999;
+                case "-":   return  0;
+                default:    return Integer.parseInt( strnum ); 
+            } 
+        }
+        /** <p>取得文章的 {@code UID}</p> 
+         *  <p>其意思就是 [Bsn]-[snA] = [UID]</p>
+         *  @return 唯一識別編號 {@code [String]}*/
+        private String getUID() throws IndexOutOfBoundsException, PatternSyntaxException{
+            String fistSplt[] = inUrl.split("bsn=")[1].split("&");
+            return String.join("-", /* Bsn */ fistSplt[0], /* snA */ fistSplt[1].substring( 4 ) );
         }
 
         /** 取得最大頁數 
          *  @param element 頁數的 HTML 元素
          *  @return 最大頁數 {@code [int]}*/
-        private int getMaxPage( Element element ){
+        private int getMaxPage( Element element ) throws NumberFormatException{
             return Integer.parseInt( element.children().last().text() ); 
         }
 

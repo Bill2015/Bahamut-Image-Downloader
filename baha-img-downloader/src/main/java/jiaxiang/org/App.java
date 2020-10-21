@@ -9,6 +9,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import jiaxiang.org.controller.DownloadController;
 import jiaxiang.org.controller.FilterController;
+import jiaxiang.org.controller.HistoryController;
 import jiaxiang.org.controller.ImageViewController;
 import jiaxiang.org.controller.TitleMenuController;
 import jiaxiang.org.controller.SearchController;
@@ -88,7 +89,7 @@ public class App extends Application {
             "/styles/borderTitle.css",
             "/styles/tabPane.css",
             "/styles/alertMenu.css",
-           "/styles/button.css",
+            "/styles/button.css",
             "/styles/nodeBox.css",
             "/styles/progressBar.css"
         );
@@ -111,7 +112,7 @@ public class App extends Application {
         final FilterController      filterController    = new FilterController( dataModel, filterView, PRIMARY_STAGE );
         final DownloadController    downloadController  = new DownloadController( dataModel, downloadView, PRIMARY_STAGE );
         final TitleMenuController   titleMenuController = new TitleMenuController( dataModel, titleMenuView, PRIMARY_STAGE );
-
+        final HistoryController     historyController   = new HistoryController( dataModel, historyView, downloadView, searchView );
 
     }
 

@@ -50,6 +50,7 @@ public class SearchController {
                 System.out.println("List Cleared");
             }
 
+            //網路搜尋服務開始
             System.out.println( "Task Started！" );
             BahaImageGetterService bahaGetterService = new BahaImageGetterService( searchView.getInputURL(), fStart, fEnd, imageBoxList );
             searchView.getSearchProgressBar().progressProperty().bind( bahaGetterService.progressProperty() );
@@ -60,15 +61,17 @@ public class SearchController {
             //當完成後
             bahaGetterService.setOnSucceeded(evt -> {
                 final RotateTransition delay = new RotateTransition();
-                delay.setDelay( Duration.seconds(2000) );
+                delay.setDelay( Duration.seconds( 2000 ) );
                 delay.setOnFinished( delayEvt -> searchView.setProgressBarVisiable( false ) );
                 delay.play();
                 searchView.getSearchButton().setDisable( false );     //開啟搜尋按鈕
                 System.out.println( "Task End！" );
 
+                //設定目前紀錄
+                dataModel.setNowHistory( bahaGetterService.getValue() );
                 //取得文章標題
-                System.out.println( "文章標題：" + bahaGetterService.getTitle() );
-                dataModel.setNowArticleTitle( bahaGetterService.getTitle() );
+                System.out.println( "文章標號 UID：" + dataModel.getNowArticleTitle() );
+                
             });
 
         } catch (ArrayIndexOutOfBoundsException e) {

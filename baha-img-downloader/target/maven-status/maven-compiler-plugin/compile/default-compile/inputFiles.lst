@@ -5,8 +5,8 @@ D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxian
 D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\model\DataModel.java
 D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\utils\ZipService.java
 D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\controller\TitleMenuController.java
+D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\components\HoverIcon.java
 D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\components\AlertInfo.java
-D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\utils\HistorySetProperty.java
 D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\components\MyLabel.java
 D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\view\TitleMenuView.java
 D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\controller\SearchController.java
@@ -14,12 +14,13 @@ D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxian
 D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\controller\ImageViewController.java
 D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\utils\BahaImageGetterService.java
 D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\App.java
-D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\components\HistoryBox.java
+D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\utils\HistoryListProperty.java
 D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\components\InfoStage.java
 D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\MainApp.java
 D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\view\FilterView.java
 D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\components\ProgressStage.java
 D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\view\ImagePaneView.java
+D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\bin\History.java
 D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\controller\DownloadController.java
 D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\controller\FilterController.java
 D:\GitHubRepo\Bahamut-Image-Downloader\baha-img-downloader\src\main\java\jiaxiang\org\view\DownloadView.java

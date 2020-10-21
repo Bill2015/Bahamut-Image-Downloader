@@ -7,11 +7,9 @@ import javafx.animation.ScaleTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -128,33 +126,26 @@ public class ImageBox extends BorderPane{
     /** 新增刪除按鈕 
      *  @return 回傳刪除按鈕 {@code [Label]}*/
     final private Label createDeleteIcon(){
-        Label deleteIcon = new Label("", new ImageView("/textures/delete.png") );
-        deleteIcon.addEventHandler( MouseEvent.MOUSE_RELEASED , evt -> {
-            if( evt.getButton() == MouseButton.PRIMARY ){
-                ScaleTransition scaleTransition = new ScaleTransition( Duration.seconds( 0.4 ), this );
-                scaleTransition.setToX( 0.0 );scaleTransition.setToY( 0.0 );
-                scaleTransition.playFromStart();
-
-                scaleTransition.setOnFinished( aniEvt -> {
-                    ((ImagePaneView) this.getParent().getParent().getParent().getParent()).getFlowPane().getChildren().remove( this );
-                    this.setScaleX( 1.0 );this.setScaleY( 1.0 );
-                } );
-                
-                needSaved = false;
-            }
-        } );
-
-        //放大與縮小效果
-        ScaleTransition scaleIn = new ScaleTransition( Duration.seconds(0.1), deleteIcon );
-        scaleIn.setToX( 1.6 );scaleIn.setToY( 1.6 );
-        ScaleTransition scaleOut = new ScaleTransition( Duration.seconds(0.1), deleteIcon );
-        scaleOut.setToX( 1 );scaleOut.setToY( 1 );
-
-        //刪除 Icon 的 Hover 效果
-        deleteIcon.setOnMouseEntered( evt -> scaleIn.play() );
-        deleteIcon.setOnMouseExited( evt -> scaleOut.play() );
-        deleteIcon.setTooltip( new Tooltip("刪除此圖片，儲存時將不會存到") );
-
+        Label deleteIcon = HoverIcon.getBuilder()
+                                        .setFileUrl( "/textures/delete.png" )
+                                        .setHintText( "刪除此圖片，儲存時將不會存到" )
+                                        .setClickEvent(   evt -> {
+                                            //滑鼠左鍵
+                                            if( evt.getButton() == MouseButton.PRIMARY ){
+                                                //框框縮小
+                                                ScaleTransition scaleTransition = new ScaleTransition( Duration.seconds( 0.4 ), this );
+                                                scaleTransition.setToX( 0.0 );scaleTransition.setToY( 0.0 );
+                                                scaleTransition.playFromStart();
+                                
+                                                //移除自己
+                                                scaleTransition.setOnFinished( aniEvt -> {
+                                                    ((ImagePaneView) this.getParent().getParent().getParent().getParent()).getFlowPane().getChildren().remove( this );
+                                                    this.setScaleX( 1.0 );this.setScaleY( 1.0 );
+                                                } );
+                                                
+                                                needSaved = false;
+                                            }
+                                        }).build();
         return deleteIcon;
     }
 
